@@ -1,0 +1,22 @@
+# 关闭自动https，本地开发用
+{
+    auto_https off
+}
+# 监听8080端口
+:8888  {
+    # 所有/api/*请求转发到后端接口
+  # 匹配 /api 开头，去掉 /api 前缀再转发（对应 vite rewrite）
+    handle /api/* {
+        # 截取路径：把 /api/xxx 变成 /xxx
+        uri strip_prefix /api
+        # 转发到你的后端地址
+        reverse_proxy http://192.168.1.111:10001
+    }
+    # 其余路径走前端dist，SPA刷新404自动回index.html
+    handle {
+        root * ./dist
+        try_files {path} /index.html
+        file_server
+        encode gzip
+    }
+}
